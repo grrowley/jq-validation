@@ -2,387 +2,411 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>JS Validation</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <style>
-    .input {
-      border-bottom: 1px solid grey;
-      padding: 1rem 0;
-    }
-    .input:last-of-type {
-      margin-bottom: 1rem;
-    }
-    .input .error {
-      font-size: 12px;
-      font-style: italic;
-      margin: 0;
-      padding: 0;
-    }
-  </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>JS Validation</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<style>
+		.input {
+			border-bottom: 1px solid grey;
+			padding: 1rem 0;
+		}
+
+		.input:last-of-type {
+			margin-bottom: 1rem;
+		}
+
+		.input .error {
+			font-size: 12px;
+			font-style: italic;
+			margin: 0;
+			padding: 0;
+		}
+	</style>
 </head>
 
 <body>
-  <form>
-    <div class="input">
-      <label for="alpha">Alpha Test</label>
-      <br>
-      <input id="alpha" type="text" name="alpha">
-    </div>
-    <div class="input">
-      <label for="alpha_dash">Alpha Dash Test</label>
-      <br>
-      <input id="alpha_dash" type="text" name="alpha_dash">
-    </div>
-    <div class="input">
-      <label for="alpha_numeric">Alpha Numeric Test</label>
-      <br>
-      <input id="alpha_numeric" type="text" name="alpha_numeric">
-    </div>
-    <div class="input">
-      <label for="is_numeric">Is Numeric Test</label>
-      <br>
-      <input id="is_numeric" type="text" name="is_numeric">
-    </div>
-    <div class="input">
-      <label for="matches">Matches Test</label>
-      <br>
-      <input id="matches" type="text" name="matches">
-    </div>
-    <div class="input">
-      <label for="min_length">Minimum Length Test</label>
-      <br>
-      <input id="min_length" type="text" name="min_length">
-    </div>
-    <div class="input">
-      <label for="max_length">Maximum Length Test</label>
-      <br>
-      <input id="max_length" type="text" name="max_length">
-    </div>
-    <div class="input">
-      <label for="exact_length">Exact Length Test</label>
-      <br>
-      <input id="exact_length" type="text" name="exact_length">
-    </div>
-    <div class="input">
-      <label for="required">Required Test</label>
-      <br>
-      <input id="required" type="text" name="required">
-    </div>
-    <div class="input">
-      <label for="valid_email">Email Test</label>
-      <br>
-      <input id="valid_email" type="text" name="valid_email">
-    </div>
-    <div class="input">
-      <label for="valid_phone">Phone Test</label>
-      <br>
-      <input id="valid_phone" type="text" name="valid_phone">
-    </div>
-    <button type="submit">Validate</button>
-  </form>
-  <script>
-    $(document).ready(function () {
-      $('form').submit(function (e) {
-        e.preventDefault();
-        var data = $(this).serializeArray();
-        var errs = validateData(data, {
-          alpha         : 'alpha',
-          alpha_dash    : 'alpha_dash',
-          alpha_numeric : 'alpha_numeric',
-          exact_length  : 'exact_length,5',
-          is_numeric    : 'is_numeric',
-          matches       : 'matches,alpha',
-          max_length    : 'max_length,5',
-          min_length    : 'min_length,5',
-          required      : 'required',
-          valid_email   : 'valid_email',
-          valid_phone   : 'valid_phone'
-        });
-        alert(errs);
-      });
-    });
-
-    function validateData(data, rules, opts) {
-
-      // default options
-      var defaults = {
-        debug: 1,
-        errorClass: 'has-error',
-        errorMessage: {
-          alpha: 'Field may only contain letters',
-          alpha_dash: 'Field may only contain letters, numbers, and dash or underscores',
-          alpha_numeric: 'Field may only contain letters and number',
-          exact_length: 'Field must be {0} characters long',
-          is_numeric: 'Field must be a numeric value',
-          matches: 'Field does not match {0}',
-          max_length: 'Field must be {0} characters or less',
-          min_length: 'Field must be {0} characters or greater',
-          required: 'Required Field',
-          valid_email: 'Valid email address required',
-          valid_phone: 'Valid phone number required'
-        },
-        errorOutputEl: 'p',
-        errorOutputClass: 'error'
-      };
-
-      var keyval = {}; // holds <field name>:<field value> object
-
-      var options = mergeDeep(defaults, opts ? opts : {}); // combine defaults and user options
-
-      var errorsCount = 0; // current error count
-
-      var errorsObject = {}; // error output data
-
-      //
-      // Validation Methods ---------------------------------------->>>
-      //
-
-      var alpha = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        var test = /^[a-zA-Z]*$/;
-        if (!test.test(value)) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.alpha));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var alpha_dash = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        var test = /^[a-zA-Z0-9-_]+$/;
-        if (!test.test(value)) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.alpha_dash));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var alpha_numeric = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        var test = /^[a-zA-Z0-9]+$/;
-        if (!test.test(value)) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.alpha_numeric));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var exact_length = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        if (value.length === parseInt(params[0])) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.exact_length, params));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var is_numeric = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        if (parseFloat(value)) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.is_numeric));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var matches = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        if (params[0] && keyval[params[0]] !== value) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.matches, params));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var max_length = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        if (value.length > parseInt(params[0])) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.max_length, params));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var min_length = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        if (value.length < parseInt(params[0])) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.min_length, params));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var required = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        if (!value) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.required, null));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var valid_email = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        var test =
-          /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (!test.test(value)) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.valid_email));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      var valid_phone = function (field, value, params, $elem, $parent) {
-        errorsCountAdd();
-        var test = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
-        if (!test.test(value)) {
-          $elem.addClass(options.errorClass);
-          $parent.append(errorDisplay(options.errorMessage.valid_phone));
-        } else {
-          $elem.removeClass(options.errorClass);
-          $parent.children('.' + options.errorOutputClass).remove();
-          errorsCountRem();
-        }
-      }
-
-      //
-      // END Validation Methods ------------------------------------>>>
-      //
-
-      function errorsCountAdd() {
-        errorsCount = (errorsCount + 1);
-      }
-
-      function errorsCountRem() {
-        errorsCount = (errorsCount - 1);
-      }
-
-      function errorDisplay(text, params) {
-        var output = text.replace(/{(\d+)}/, function(match, i) {
-          return typeof params[i] != 'undefined'
-            ? params[i]
-            : match
-        });
-        return '<' + options.errorOutputEl + ' class="' + options.errorOutputClass + '">' + output + '</' + options.errorOutputEl +
-          '>';
-      }
-
-      $.each(data, function (i, field) {
-        var name = field.name;
-        keyval[field.name] = field.value;
-        if (rules[name]) {
-          $.each(rules[name].split('|'), function (i, rule) {
-            var $elem = $('[name="' + field.name + '"]');
-            var param = rule.split(',');
-            var name = param[0];
-            param.splice(0, 1);
-            switch (name) {
-              case "alpha":
-                alpha(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "alpha_dash":
-                alpha_dash(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "alpha_numeric":
-                alpha_numeric(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "exact_length":
-                exact_length(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "is_numeric":
-                is_numeric(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "matches":
-                matches(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "max_length":
-                max_length(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "min_length":
-                min_length(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "required":
-                required(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "valid_email":
-                valid_email(field.name, field.value, param, $elem, $elem.parent());
-                break;
-              case "valid_phone":
-                valid_phone(field.name, field.value, param, $elem, $elem.parent());
-                break;
-            }
-          });
-        }
-      });
-
-      if (options.debug) {
-        console.log('rules', rules);
-        console.log('input', data);
-      }
-
-      return errorsCount;
-    }
+	<form>
+		<div class="input">
+			<label for="alpha">Alpha Test</label>
+			<br>
+			<input id="alpha" type="text" name="alpha">
+		</div>
+		<div class="input">
+			<label for="alpha_dash">Alpha Dash Test</label>
+			<br>
+			<input id="alpha_dash" type="text" name="alpha_dash">
+		</div>
+		<div class="input">
+			<label for="alpha_numeric">Alpha Numeric Test</label>
+			<br>
+			<input id="alpha_numeric" type="text" name="alpha_numeric">
+		</div>
+		<div class="input">
+			<label for="is_numeric">Is Numeric Test</label>
+			<br>
+			<input id="is_numeric" type="text" name="is_numeric">
+		</div>
+		<div class="input">
+			<label for="matches">Matches Test</label>
+			<br>
+			<input id="matches" type="text" name="matches">
+		</div>
+		<div class="input">
+			<label for="min_length">Minimum Length Test</label>
+			<br>
+			<input id="min_length" type="text" name="min_length">
+		</div>
+		<div class="input">
+			<label for="max_length">Maximum Length Test</label>
+			<br>
+			<input id="max_length" type="text" name="max_length">
+		</div>
+		<div class="input">
+			<label for="exact_length">Exact Length Test</label>
+			<br>
+			<input id="exact_length" type="text" name="exact_length">
+		</div>
+		<div class="input">
+			<label for="required">Required Test</label>
+			<br>
+			<input id="required" type="text" name="required">
+		</div>
+		<div class="input">
+			<label for="valid_email">Email Test</label>
+			<br>
+			<input id="valid_email" type="text" name="valid_email">
+		</div>
+		<div class="input">
+			<label for="valid_phone">Phone Test</label>
+			<br>
+			<input id="valid_phone" type="text" name="valid_phone">
+		</div>
+		<button type="submit">Validate</button>
+	</form>
+	<script>
+		$(document).ready(function () {
+			$('form').submit(function (e) {
+				e.preventDefault();
+				var data = $(this).serializeArray();
+				var errs = validateData(data, {
+					alpha: 'alpha',
+					alpha_dash: 'alpha_dash',
+					alpha_numeric: 'alpha_numeric',
+					exact_length: 'exact_length,5',
+					is_numeric: 'is_numeric',
+					matches: 'matches,alpha',
+					max_length: 'max_length,5',
+					min_length: 'min_length,5',
+					required: 'required',
+					valid_email: 'valid_email',
+					valid_phone: 'valid_phone'
+				});
+				alert(errs);
+			});
+		});
 
 
-    function isObject(elem) {
-      return (elem && typeof elem === 'object' && !Array.isArray(elem));
-    }
+		function validateData(data, rules, opts) {
+			// default options
+			var defaults = {
+				debug: 1,
+				errorClass: 'has-error',
+				errorMessage: {
+					alpha: 'Field may only contain letters',
+					alpha_dash: 'Field may only contain letters, numbers, and dash or underscores',
+					alpha_numeric: 'Field may only contain letters and number',
+					exact_length: 'Field must be {0} characters long',
+					is_numeric: 'Field must be a numeric value',
+					matches: 'Field does not match {0}',
+					max_length: 'Field must be {0} characters or less',
+					min_length: 'Field must be {0} characters or greater',
+					required: 'Required Field',
+					valid_email: 'Valid email address required',
+					valid_phone: 'Valid phone number required'
+				},
+				errorOutputEl: 'p',
+				errorOutputClass: 'error'
+			};
 
-    function mergeDeep(target, source) {
-      var output = Object.assign({}, target);
-      if (isObject(target) && isObject(source)) {
-        Object.keys(source).forEach(function (key) {
-          if (isObject(source[key])) {
-            if (!(key in target)) {
-              Object.assign(output, {
-                [key]: source[key]
-              });
-            } else {
-              output[key] = mergeDeep(target[key], source[key]);
-            }
-          } else {
-            Object.assign(output, {
-              [key]: source[key]
-            });
-          }
-        });
-      }
-      return output;
-    }
-  </script>
+			var keyval = {}; // holds <field name>:<field value> object
+
+			var options = mergeDeep(defaults, opts ? opts : {}); // combine defaults and user options
+
+			var errorsCount = 0; // current error count
+
+			var errorsObject = {}; // error output data
+
+			//
+			// Validation Methods ---------------------------------------->>>
+			//
+
+			var alpha = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				var test = /^[a-zA-Z]*$/;
+				if (!test.test(value)) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.alpha)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.alpha));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var alpha_dash = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				var test = /^[a-zA-Z0-9-_]+$/;
+				if (!test.test(value)) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.alpha_dash)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.alpha_dash));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var alpha_numeric = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				var test = /^[a-zA-Z0-9]+$/;
+				if (!test.test(value)) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.alpha_numeric)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.alpha_numeric));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var exact_length = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				if (value.length === parseInt(params[0])) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.exact_length)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.exact_length, params));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var is_numeric = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				if (parseFloat(value)) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.is_numeric)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.is_numeric));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var matches = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				if (params[0] && keyval[params[0]] !== value) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.matches)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.matches, params));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var max_length = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				if (value.length > parseInt(params[0])) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.max_length)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.max_length, params));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var min_length = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				if (value.length < parseInt(params[0])) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.min_length)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.min_length, params));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var required = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				if (!value) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.required)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.required));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var valid_email = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				var test =
+					/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+				if (!test.test(value)) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.valid_email)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.valid_email));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			var valid_phone = function (field, value, params, $elem, $parent) {
+				errorsCountAdd();
+				var test = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+				if (!test.test(value)) {
+					$elem.addClass(options.errorClass);
+					if ($($parent.find('.' + options.errorOutputClass)[0]).text() !== $(errorDisplay(options.errorMessage.valid_phone)).text()) {
+						$parent.append(errorDisplay(options.errorMessage.valid_phone));
+					}
+				} else {
+					$elem.removeClass(options.errorClass);
+					$parent.children('.' + options.errorOutputClass).remove();
+					errorsCountRem();
+				}
+			}
+
+			//
+			// END Validation Methods ------------------------------------>>>
+			//
+
+			function errorsCountAdd() {
+				errorsCount = (errorsCount + 1);
+			}
+
+			function errorsCountRem() {
+				errorsCount = (errorsCount - 1);
+			}
+
+			function errorDisplay(text, params) {
+				var output = text.replace(/{(\d+)}/, function (match, i) {
+					return typeof params != 'undefined'
+						? params[i]
+						: match
+				});
+				return '<' + options.errorOutputEl + ' class="' + options.errorOutputClass + '">' + output + '</' + options.errorOutputEl +
+					'>';
+			}
+
+			$.each(data, function (i, field) {
+				var name = field.name;
+				keyval[field.name] = field.value;
+				if (rules[name]) {
+					$.each(rules[name].split('|'), function (i, rule) {
+						var $elem = $('[name="' + field.name + '"]');
+						var param = rule.split(',');
+						var name = param[0];
+						param.splice(0, 1);
+						switch (name) {
+							case "alpha":
+								alpha(/^[a-zA-Z]*$/, field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "alpha_dash":
+								alpha_dash(field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "alpha_numeric":
+								alpha_numeric(field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "exact_length":
+								exact_length(field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "is_numeric":
+								is_numeric(field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "matches":
+								matches(field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "max_length":
+								max_length(field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "min_length":
+								min_length(field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "required":
+								required(field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "valid_email":
+								valid_email(field.name, field.value, param, $elem, $elem.parent());
+								break;
+							case "valid_phone":
+								valid_phone(field.name, field.value, param, $elem, $elem.parent());
+								break;
+						}
+					});
+				}
+			});
+
+			if (options.debug) {
+				console.log('rules', rules);
+				console.log('input', data);
+			}
+
+			return errorsCount;
+
+			// Local Helper Functions
+			function isObject(elem) {
+				return (elem && typeof elem === 'object' && !Array.isArray(elem));
+			}
+
+			function mergeDeep(target, source) {
+				var output = Object.assign({}, target);
+				if (isObject(target) && isObject(source)) {
+					Object.keys(source).forEach(function (key) {
+						if (isObject(source[key])) {
+							if (!(key in target)) {
+								Object.assign(output, {
+									[key]: source[key]
+								});
+							} else {
+								output[key] = mergeDeep(target[key], source[key]);
+							}
+						} else {
+							Object.assign(output, {
+								[key]: source[key]
+							});
+						}
+					});
+				}
+				return output;
+			}
+		}
+	</script>
 </body>
 
 </html>
