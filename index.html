@@ -83,6 +83,15 @@
 			<br>
 			<input id="valid_phone" type="text" name="valid_phone">
 		</div>
+		<div class="input">
+			<label for="select">Select</label>
+			<br>
+			<select id="select" name="select">
+				<option value="" default>Choose One</option>
+				<option value="test">Test</option>
+				<option value="another">Another</option>
+			</select>
+		</div>
 		<button type="submit">Validate</button>
 	</form>
 	<script>
@@ -101,7 +110,8 @@
 					min_length: 'min_length,5',
 					required: 'required',
 					valid_email: 'valid_email',
-					valid_phone: 'valid_phone'
+					valid_phone: 'valid_phone',
+					select: 'required'
 				});
 				alert(errs);
 			});
@@ -111,7 +121,7 @@
 		function validateData(data, rules, opts) {
 			// default options
 			var defaults = {
-				debug: 1,
+				debug: 0,
 				errorClass: 'has-error',
 				errorMessage: {
 					alpha: 'Field may only contain letters',
@@ -127,7 +137,8 @@
 					valid_phone: 'Valid phone number required'
 				},
 				errorOutputEl: 'p',
-				errorOutputClass: 'error'
+				errorOutputClass: 'error',
+				inputNameAttribute: 'name'
 			};
 
 			var keyval = {}; // holds <field name>:<field value> object
@@ -329,44 +340,47 @@
 				keyval[field.name] = field.value;
 				if (rules[name]) {
 					$.each(rules[name].split('|'), function (i, rule) {
-						var $elem = $('[name="' + field.name + '"]');
+						console.log('[' + defaults.inputNameAttribute + '="' + field.name + '"]');
+						var $elem = $('[' + defaults.inputNameAttribute + '="' + field.name + '"]');
 						var param = rule.split(',');
 						var name = param[0];
 						param.splice(0, 1);
-						switch (name) {
-							case "alpha":
-								alpha(/^[a-zA-Z]*$/, field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "alpha_dash":
-								alpha_dash(field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "alpha_numeric":
-								alpha_numeric(field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "exact_length":
-								exact_length(field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "is_numeric":
-								is_numeric(field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "matches":
-								matches(field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "max_length":
-								max_length(field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "min_length":
-								min_length(field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "required":
-								required(field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "valid_email":
-								valid_email(field.name, field.value, param, $elem, $elem.parent());
-								break;
-							case "valid_phone":
-								valid_phone(field.name, field.value, param, $elem, $elem.parent());
-								break;
+						if ($elem.length) {
+							switch (name) {
+								case "alpha":
+									alpha(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "alpha_dash":
+									alpha_dash(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "alpha_numeric":
+									alpha_numeric(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "exact_length":
+									exact_length(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "is_numeric":
+									is_numeric(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "matches":
+									matches(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "max_length":
+									max_length(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "min_length":
+									min_length(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "required":
+									required(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "valid_email":
+									valid_email(field.name, field.value, param, $elem, $elem.parent());
+									break;
+								case "valid_phone":
+									valid_phone(field.name, field.value, param, $elem, $elem.parent());
+									break;
+							}	
 						}
 					});
 				}
